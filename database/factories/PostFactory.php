@@ -17,9 +17,9 @@ class PostFactory extends Factory
     public function definition(): array
     {
         return [
-            'title' => $this->faker->sentence,        // ランダムなタイトル
-            'content' => $this->faker->realText(200), // ランダムな本文
-            'user_id' => 1, // 実際に存在するユーザーIDを指定
+            'user_id' => 1, // usersテーブルにidカラムの値が1のユーザーが存在することが前提
+            'title' => fake()->realText(20, 5),
+            'content' => fake()->realText(200, 5)
         ];
     }
 }
