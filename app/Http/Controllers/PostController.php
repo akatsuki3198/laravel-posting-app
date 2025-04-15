@@ -15,6 +15,8 @@ class PostController extends Controller
     {
         $posts = Auth::user()->posts()->orderBy('created_at', 'desc')->get();
 
+        $posts = Post::orderBy('updated_at', 'asc')->get(); // 古い順
+
         return view('posts.index', compact('posts'));
     }
     
@@ -33,11 +35,14 @@ class PostController extends Controller
     // 作成機能
     public function store(PostRequest $request)
     {
-        $post = new Post();
-        $post->title = $request->input('title');
-        $post->content = $request->input('content');
-        $post->user_id = Auth::id();
-        $post->save();
+        $validated = $request->validate([
+            'title' => 'required|max:40',
+            'content' => 'required|max:200',
+        ]);
+
+        $validated['user_id'] = auth()->id();
+    
+        Post::create($validated);
 
         return redirect()->route('posts.index')->with('flash_message', '投稿が完了しました。');
     }
@@ -59,9 +64,15 @@ class PostController extends Controller
             return redirect()->route('posts.index')->with('error_message', '不正なアクセスです。');
         }
 
-        $post->title = $request->input('title');
-        $post->content = $request->input('content');
-        $post->save();
+
+        $validated = $request->validate([
+            'title' => 'required|max:40',
+            'content' => 'required|max:200',
+        ]);
+    
+        $validated['user_id'] = auth()->id();
+
+        $post->update($validated);
 
         return redirect()->route('posts.show', $post)->with('flash_message', '投稿を編集しました。');
     }
